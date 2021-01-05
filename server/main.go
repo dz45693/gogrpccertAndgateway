@@ -39,9 +39,12 @@ func main() {
 }
 func GrpcTslServer(grpctslPort string) error {
 	//证书
-	cert, _ := tls.LoadX509KeyPair("../cert/server.pem", "../cert/server.key")
+	cert, a := tls.LoadX509KeyPair("../certs/server.pem", "../certs/server.key")
+	if a != nil {
+		fmt.Println(a)
+	}
 	certPool := x509.NewCertPool()
-	ca, _ := ioutil.ReadFile("../cert/ca.pem")
+	ca, _ := ioutil.ReadFile("../certs/ca.pem")
 	certPool.AppendCertsFromPEM(ca)
 
 	creds := credentials.NewTLS(&tls.Config{

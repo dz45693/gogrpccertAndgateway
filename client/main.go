@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	pb "hello/protos"
-	sv "hello/server/services"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -22,7 +21,7 @@ func main() {
 	req := pb.HelloRequest{Name: "gavin"}
 	cert, err := tls.LoadX509KeyPair("../certs/client.pem", "../certs/client.key")
 	certPool := x509.NewCertPool()
-	ca, _ := ioutil.ReadFile("ca.pem")
+	ca, _ := ioutil.ReadFile("../certs/ca.pem")
 	certPool.AppendCertsFromPEM(ca)
 
 	creds := credentials.NewTLS(&tls.Config{
@@ -37,11 +36,13 @@ func main() {
 		return
 	}
 	defer conn.Close()
-	c := sv.NewServer()
+	//c := sv.NewServer()
+	c := pb.NewGreeterClient(conn)
 	r, err := c.SayHello(context.Background(), &req)
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	// 打印返回值
 	fmt.Println(r)
 	fmt.Println("http Start......................")
@@ -53,4 +54,5 @@ func main() {
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	fmt.Println(string(bodyBytes))
+
 }
